@@ -96,3 +96,27 @@ def log_activity(
             ),
         )
         connection.commit()
+def get_recent_activity(limit: int = 20) -> list[dict[str, Any]]:
+    """Return the most recent PayFlow activity records."""
+    _initialize_database()
+
+    limit = max(1, min(int(limit), 100))
+
+    with sqlite3.connect(DATABASE_PATH, timeout=10) as connection:
+        connection.row_factory = sqlite3.Row
+        rows = connection.execute(
+            """
+            SELECT
+                id,
+                created_at,
+                user_request,
+                action,
+                paypal_response
+            FROM activity_log
+            ORDER BY created_at DESC, id DESC
+            LIMIT ?
+            """,
+            (limit,),
+        ).fetchall()
+
+    return [dict(row) for row in rows]

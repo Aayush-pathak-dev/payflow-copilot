@@ -3,7 +3,7 @@ import json
 
 from agent import interpret_request
 from paypal_tools import create_paypal_invoice
-from database import log_activity
+from database import log_activity,get_recent_activity
 
 
 st.set_page_config(
@@ -108,7 +108,53 @@ if user_input:
             "content": data.get("confirmation_message", ""),
         }
     )
+# Activity history
+st.subheader("Activity history")
 
+try:
+    activity_rows = get_recent_activity(limit=20)
+except Exception as exc:
+    st.warning("Could not load activity history.")
+    st.caption(str(exc))
+else:
+    if not activity_rows:
+        st.info("No activity recorded yet.")
+    else:
+        history = []
+
+        for row in activity_rows:
+            try:
+                response_data = json.loads(row.get("paypal_response") or "{}")
+            except (TypeError, ValueError):
+                response_data = {}
+
+            ok = bool(response_data.get("ok"))
+            invoice_id = response_data.get("invoice_id") or ""
+            error = response_data.get("error") or ""
+
+            if ok:
+                result = "Success"
+            elif error:
+                result = "Failed"
+            else:
+                result = "Recorded"
+
+            history.append(
+                {
+                    "Time": row.get("created_at", ""),
+                    "Action": row.get("action", ""),
+                    "Result": result,
+                    "Invoice ID": invoice_id,
+                    "Request": row.get("user_request", ""),
+                    "Error": error,
+                }
+            )
+
+        st.dataframe(
+            history,
+            use_container_width=True,
+            hide_index=True,
+        )
 
 # Confirmation section survives Streamlit reruns
 if st.session_state.pending_invoice:
