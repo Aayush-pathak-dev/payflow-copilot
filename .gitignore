@@ -1,1 +1,7 @@
 .env
+.venv/
+venv/
+__pycache__/
+*.pyc
+payflow_activity.db
+payflow_activity.db-*
