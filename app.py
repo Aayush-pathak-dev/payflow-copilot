@@ -200,6 +200,4 @@ if st.session_state.pending_invoice:
     if col2.button("❌ Cancel"):
         st.session_state.pending_invoice = None
         st.info("Cancelled. No PayPal action was taken.")
-        st.rerun()
-
-
+        st.rerun() 
