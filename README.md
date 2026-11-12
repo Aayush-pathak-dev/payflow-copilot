@@ -178,9 +178,10 @@ The current client-initialization code may require both AI-provider credentials 
 
 ### 1. Open the project
 
-After cloning your repository, enter its directory:
+After cloning my repository, enter its directory:
 
 ```bash
+git clone https://github.com/Aayush-pathak-dev/payflow-copilot.git
 cd payflow-copilot
 ```
 
